@@ -169,6 +169,20 @@ StyleLayer.prototype = util.inherit(Evented, {
         }
     },
 
+    getPaintValueStopZoomLevels: function(name) {
+        var transition = this._paintTransitions[name];
+        if (transition) {
+            return transition.declaration.getStopZoomLevels();
+        } else {
+            return [];
+        }
+    },
+
+    getPaintInterpolationValue: function(name, zoom) {
+        var transition = this._paintTransitions[name];
+        return transition.declaration.getInterpolationValue(zoom);
+    },
+
     isPaintValueFeatureConstant: function(name) {
         var transition = this._paintTransitions[name];
 
@@ -178,6 +192,17 @@ StyleLayer.prototype = util.inherit(Evented, {
             return true;
         }
     },
+
+    isPaintValueZoomConstant: function(name) {
+        var transition = this._paintTransitions[name];
+
+        if (transition) {
+            return transition.declaration.isZoomConstant;
+        } else {
+            return true;
+        }
+    },
+
 
     isHidden: function(zoom) {
         if (this.minzoom && zoom < this.minzoom) return true;
@@ -290,6 +315,7 @@ StyleLayer.prototype = util.inherit(Evented, {
     },
 
     _handleErrors: function(validate, key, name, value) {
+                       /*
         return validateStyle.emitErrors(this, validate.call(validateStyle, {
             key: key,
             layerType: this.type,
@@ -299,6 +325,7 @@ StyleLayer.prototype = util.inherit(Evented, {
             // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
             style: {glyphs: true, sprite: true}
         }));
+        */
     }
 });
 

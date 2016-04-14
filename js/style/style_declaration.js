@@ -17,7 +17,9 @@ function StyleDeclaration(reference, value) {
     var parsedValue = this.type === 'color' ? parseColor(this.value) : value;
     this.calculate = MapboxGLFunction[reference.function || 'piecewise-constant'](parsedValue);
     this.isFeatureConstant = this.calculate.isFeatureConstant;
-    this.isGlobalConstant = this.calculate.isGlobalConstant;
+    this.isZoomConstant = this.calculate.isZoomConstant;
+    this.getStopZoomLevels = this.calculate.getStopZoomLevels;
+    this.getInterpolationValue = this.calculate.getInterpolationValue;
 
     if (reference.function === 'piecewise-constant' && reference.transition) {
         this.calculate = transitioned(this.calculate);
