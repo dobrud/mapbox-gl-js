@@ -315,7 +315,6 @@ StyleLayer.prototype = util.inherit(Evented, {
     },
 
     _handleErrors: function(validate, key, name, value) {
-                       /*
         return validateStyle.emitErrors(this, validate.call(validateStyle, {
             key: key,
             layerType: this.type,
@@ -325,7 +324,6 @@ StyleLayer.prototype = util.inherit(Evented, {
             // Workaround for https://github.com/mapbox/mapbox-gl-js/issues/2407
             style: {glyphs: true, sprite: true}
         }));
-        */
     }
 });
 
