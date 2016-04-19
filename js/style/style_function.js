@@ -9,8 +9,6 @@ exports.interpolated = function(parameters) {
     };
     outer.isFeatureConstant = inner.isFeatureConstant;
     outer.isZoomConstant = inner.isZoomConstant;
-    outer.getStopZoomLevels = inner.getStopZoomLevels;
-    outer.getInterpolationValue = inner.getInterpolationValue;
     return outer;
 };
 

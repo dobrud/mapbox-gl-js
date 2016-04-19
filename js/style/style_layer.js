@@ -178,9 +178,9 @@ StyleLayer.prototype = util.inherit(Evented, {
         }
     },
 
-    getPaintInterpolationValue: function(name, zoom) {
+    getPaintInterpolationT: function(name, zoom) {
         var transition = this._paintTransitions[name];
-        return transition.declaration.getInterpolationValue(zoom);
+        return transition.declaration.calculateInterpolationT({ zoom: zoom });
     },
 
     isPaintValueFeatureConstant: function(name) {

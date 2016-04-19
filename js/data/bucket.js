@@ -423,7 +423,7 @@ function createGetUniform(attribute, stopOffset) {
     return function(layer, globalProperties) {
         // stopInterp indicates which stops need to be interpolated.
         // If stopInterp is 3.5 then interpolate half way between stops 3 and 4.
-        var stopInterp = layer.getPaintInterpolationValue(attribute.paintProperty, globalProperties.zoom);
+        var stopInterp = layer.getPaintInterpolationT(attribute.paintProperty, globalProperties.zoom);
         // We can only store four stop values in the buffers. stopOffset is the number of stops that come
         // before the stops that were added to the buffers.
         return [Math.max(0, Math.min(4, stopInterp - stopOffset))];

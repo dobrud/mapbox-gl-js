@@ -18,7 +18,6 @@ function StyleDeclaration(reference, value) {
     this.calculate = MapboxGLFunction[reference.function || 'piecewise-constant'](parsedValue);
     this.isFeatureConstant = this.calculate.isFeatureConstant;
     this.isZoomConstant = this.calculate.isZoomConstant;
-    this.getInterpolationValue = this.calculate.getInterpolationValue;
 
     if (reference.function === 'piecewise-constant' && reference.transition) {
         this.calculate = transitioned(this.calculate);
@@ -26,11 +25,20 @@ function StyleDeclaration(reference, value) {
 
     if (!this.isFeatureConstant && !this.isZoomConstant) {
         this.stopZoomLevels = [];
+        var interpolationAmountStops = [];
         var stops = this.value.stops;
         for (var i = 0; i < this.value.stops.length; i++) {
             var zoom = stops[i][0].zoom;
-            if (this.stopZoomLevels.indexOf(zoom) < 0) this.stopZoomLevels.push(stops[i][0].zoom);
+            if (this.stopZoomLevels.indexOf(zoom) < 0) {
+                this.stopZoomLevels.push(zoom);
+                interpolationAmountStops.push([zoom, interpolationAmountStops.length]);
+            }
         }
+
+        this.calculateInterpolationT = MapboxGLFunction.interpolated({
+            stops: interpolationAmountStops,
+            base: value.base
+        });
     }
 }
 
