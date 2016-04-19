@@ -53,19 +53,19 @@ map.on('load', function() {
             "circle-radius": {
                 property: "mapbox",
                 stops: [
-                    [{ zoom: 0, data: 0 }, 2],
-                    [{ zoom: 0, data: 100 }, 10],
-                    [{ zoom: 6, data: 0 }, 20],
-                    [{ zoom: 6, data: 100 }, 100]
+                    [{ zoom: 0, value: 0 }, 2],
+                    [{ zoom: 0, value: 100 }, 10],
+                    [{ zoom: 6, value: 0 }, 20],
+                    [{ zoom: 6, value: 100 }, 100]
                 ]
             },
             "circle-color": {
                 property: "mapbox",
                 stops: [
-                    [{ zoom: 0, data: 0 }, 'red'],
-                    [{ zoom: 0, data: 100 }, 'violet'],
-                    [{ zoom: 6, data: 0 }, 'blue'],
-                    [{ zoom: 6, data: 100 }, 'green']
+                    [{ zoom: 0, value: 0 }, 'red'],
+                    [{ zoom: 0, value: 100 }, 'violet'],
+                    [{ zoom: 6, value: 0 }, 'blue'],
+                    [{ zoom: 6, value: 100 }, 'green']
                 ]
             }
         }

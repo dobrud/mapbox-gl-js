@@ -172,7 +172,7 @@ StyleLayer.prototype = util.inherit(Evented, {
     getPaintValueStopZoomLevels: function(name) {
         var transition = this._paintTransitions[name];
         if (transition) {
-            return transition.declaration.getStopZoomLevels();
+            return transition.declaration.stopZoomLevels;
         } else {
             return [];
         }

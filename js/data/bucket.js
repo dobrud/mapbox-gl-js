@@ -162,7 +162,7 @@ Bucket.prototype.createArrays = function() {
                 var paintVertexBufferName = this.getBufferName(layerName, programName);
 
                 var PaintVertexArrayType = new StructArrayType({
-                    members: layerPaintAttributes[layerName].enabled,
+                    members: layerPaintAttributes[layerName].attributes,
                     alignment: Buffer.VERTEX_ATTRIBUTE_ALIGNMENT
                 });
 
@@ -288,9 +288,9 @@ Bucket.prototype.recalculateStyleLayers = function() {
 
 Bucket.prototype.getProgramMacros = function(programInterface, layer) {
     var macros = [];
-    var enabledAttributes = this.paintAttributes[programInterface][layer.id].enabled;
-    for (var i = 0; i < enabledAttributes.length; i++) {
-        var attribute = enabledAttributes[i];
+    var attributes = this.paintAttributes[programInterface][layer.id].attributes;
+    for (var i = 0; i < attributes.length; i++) {
+        var attribute = attributes[i];
         macros.push('ATTRIBUTE_' + (attribute.isFunction ? 'ZOOM_FUNCTION_' : '') + attribute.name.toUpperCase());
     }
     return macros;
@@ -301,9 +301,9 @@ Bucket.prototype.addPaintAttributes = function(interfaceName, globalProperties, 
         var layer = this.childLayers[l];
         var length = this.arrays[this.getBufferName(interfaceName, 'vertex')].length;
         var vertexArray = this.arrays[this.getBufferName(layer.id, interfaceName)];
-        var enabled = this.paintAttributes[interfaceName][layer.id].enabled;
-        for (var m = 0; m < enabled.length; m++) {
-            var attribute = enabled[m];
+        var attributes = this.paintAttributes[interfaceName][layer.id].attributes;
+        for (var m = 0; m < attributes.length; m++) {
+            var attribute = attributes[m];
 
             var value = attribute.getValue(layer, globalProperties, featureProperties);
             var multiplier = attribute.multiplier || 1;
@@ -342,7 +342,7 @@ function createPaintAttributes(bucket) {
 
         for (var c = 0; c < bucket.childLayers.length; c++) {
             var childLayer = bucket.childLayers[c];
-            layerPaintAttributes[childLayer.id] = { enabled: [], uniforms: [] };
+            layerPaintAttributes[childLayer.id] = { attributes: [], uniforms: [] };
         }
 
         var interface_ = bucket.programInterfaces[interfaceName];
@@ -357,7 +357,7 @@ function createPaintAttributes(bucket) {
                 if (layer.isPaintValueFeatureConstant(attribute.paintProperty)) {
                     paintAttributes.uniforms.push(attribute);
                 } else if (layer.isPaintValueZoomConstant(attribute.paintProperty)) {
-                    paintAttributes.enabled.push(attribute);
+                    paintAttributes.attributes.push(attribute);
                 } else {
 
                     var zoomLevels = layer.getPaintValueStopZoomLevels(attribute.paintProperty);
@@ -375,14 +375,14 @@ function createPaintAttributes(bucket) {
 
                     var components = attribute.components;
                     if (components === 1) {
-                        paintAttributes.enabled.push(util.extend({}, attribute, {
+                        paintAttributes.attributes.push(util.extend({}, attribute, {
                             getValue: createFunctionGetValue(attribute, fourZoomLevels),
                             isFunction: true,
                             components: components * 4
                         }));
                     } else {
                         for (var k = 0; k < 4; k++) {
-                            paintAttributes.enabled.push(util.extend({}, attribute, {
+                            paintAttributes.attributes.push(util.extend({}, attribute, {
                                 getValue: createFunctionGetValue(attribute, [fourZoomLevels[k]]),
                                 isFunction: true,
                                 name: attribute.name + k

@@ -18,11 +18,19 @@ function StyleDeclaration(reference, value) {
     this.calculate = MapboxGLFunction[reference.function || 'piecewise-constant'](parsedValue);
     this.isFeatureConstant = this.calculate.isFeatureConstant;
     this.isZoomConstant = this.calculate.isZoomConstant;
-    this.getStopZoomLevels = this.calculate.getStopZoomLevels;
     this.getInterpolationValue = this.calculate.getInterpolationValue;
 
     if (reference.function === 'piecewise-constant' && reference.transition) {
         this.calculate = transitioned(this.calculate);
+    }
+
+    if (!this.isFeatureConstant && !this.isZoomConstant) {
+        this.stopZoomLevels = [];
+        var stops = this.value.stops;
+        for (var i = 0; i < this.value.stops.length; i++) {
+            var zoom = stops[i][0].zoom;
+            if (this.stopZoomLevels.indexOf(zoom) < 0) this.stopZoomLevels.push(stops[i][0].zoom);
+        }
     }
 }
 
