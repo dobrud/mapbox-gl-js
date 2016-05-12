@@ -23,16 +23,13 @@ var Attribution = require('./control/attribution');
 
 var defaultMinZoom = 0;
 var defaultMaxZoom = 20;
-/**
- * Options common to Map#addClass, Map#removeClass, and Map#setClasses, controlling
- * whether or not to smoothly transition property changes triggered by the class change.
- *
- * @typedef {Object} StyleOptions
- * @property {boolean} transition
- */
 
 /**
- * Creates a map instance.
+ * Creates a map instance. This is usually the beginning of your map:
+ * you tell Mapbox GL JS where to put the map by specifying a `container`
+ * option, and the map's style with `style` and other attributes of the map,
+ * and in return Mapbox GL JS initializes the map on your page and returns
+ * a map variable that lets you programmatically call methods on the map.
  * @class Map
  * @param {Object} options
  * @param {string|Element} options.container HTML element to initialize the map in (or element id as string)
@@ -139,6 +136,7 @@ var Map = module.exports = function(options) {
     if (options.style) this.setStyle(options.style);
     if (options.attributionControl) this.addControl(new Attribution(options.attributionControl));
 
+    this.on('error', this.onError);
     this.on('style.error', this.onError);
     this.on('source.error', this.onError);
     this.on('tile.error', this.onError);
@@ -190,7 +188,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Adds a style class to a map
+     * Adds a style class to a map.
      *
      * @param {string} klass name of style class
      * @param {StyleOptions} [options]
@@ -207,7 +205,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Removes a style class from a map
+     * Removes a style class from a map.
      *
      * @param {string} klass name of style class
      * @param {StyleOptions} [options]
@@ -225,7 +223,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Helper method to add more than one class
+     * Helper method to add more than one class.
      *
      * @param {Array<string>} klasses An array of class names
      * @param {StyleOptions} [options]
@@ -245,7 +243,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Check whether a style class is active
+     * Check whether a style class is active.
      *
      * @param {string} klass Name of style class
      * @returns {boolean}
@@ -255,7 +253,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Return an array of the current active style classes
+     * Return an array of the current active style classes.
      *
      * @returns {boolean}
      */
@@ -264,7 +262,11 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Detect the map's new width and height and resize it.
+     * Detect the map's new width and height and resize it. Given
+     * the `container` of the map specified in the Map constructor,
+     * this reads the new width from the DOM: so this method is often
+     * called after the map's container is resized by another script
+     * or the map is shown after being initially hidden with CSS.
      *
      * @returns {Map} `this`
      */
@@ -329,7 +331,10 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
 
     },
     /**
-     * Set the map's minimum zoom level, and zooms map to that level if it is currently below it. If no parameter provided, unsets the current minimum zoom (sets it to 0)
+     * Set the map's minimum zoom level, and zooms map to that level if it is
+     * currently below it. If no parameter provided, unsets the current
+     * minimum zoom (sets it to 0)
+     *
      * @param {number} minZoom Minimum zoom level. Must be between 0 and 20.
      * @returns {Map} `this
      */
@@ -349,7 +354,9 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Set the map's maximum zoom level, and zooms map to that level if it is currently above it. If no parameter provided, unsets the current maximum zoom (sets it to 20)
+     * Set the map's maximum zoom level, and zooms map to that level if it is
+     * currently above it. If no parameter provided, unsets the current
+     * maximum zoom (sets it to 20)
      * @param {number} maxZoom Maximum zoom level. Must be between 0 and 20.
      * @returns {Map} `this`
      */
@@ -368,7 +375,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         } else throw new Error('maxZoom must be between the current minZoom and ' + defaultMaxZoom + ', inclusive');
     },
     /**
-     * Get pixel coordinates (relative to map container) given a geographical location
+     * Get pixel coordinates relative to the map container, given a geographical
+     * location.
      *
      * @param {LngLat} lnglat
      * @returns {Object} `x` and `y` coordinates
@@ -378,7 +386,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Get geographical coordinates given pixel coordinates
+     * Get geographical coordinates, given pixel coordinates.
      *
      * @param {Array<number>} point [x, y] pixel coordinates
      * @returns {LngLat}
@@ -395,7 +403,12 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
      * @param {Array<string>} [params.layers] Only query features from layers with these layer IDs.
      * @param {Array} [params.filter] A mapbox-gl-style-spec filter.
      *
-     * @returns {Array<Object>} features - An array of [GeoJSON](http://geojson.org/) features matching the query parameters. The GeoJSON properties of each feature are taken from the original source. Each feature object also contains a top-level `layer` property whose value is an object representing the style layer to which the feature belongs. Layout and paint properties in this object contain values which are fully evaluated for the given zoom level and feature.
+     * @returns {Array<Object>} features - An array of [GeoJSON](http://geojson.org/) features
+     * matching the query parameters. The GeoJSON properties of each feature are taken from
+     * the original source. Each feature object also contains a top-level `layer`
+     * property whose value is an object representing the style layer to which the
+     * feature belongs. Layout and paint properties in this object contain values
+     * which are fully evaluated for the given zoom level and feature.
      *
      * @example
      * var features = map.queryRenderedFeatures([20, 35], { layers: ['my-layer-name'] });
@@ -460,7 +473,9 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Replaces the map's style object
+     * Replaces the map's style object with a new value. Unlike the `style`
+     * option in the Map constructor, this method only accepts an object
+     * of a new style, not a URL string.
      *
      * @param {Object} style A style object formatted as JSON
      * @returns {Map} `this`
@@ -524,7 +539,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
-     * Get a style object that can be used to recreate the map's style
+     * Get a style object that can be used to recreate the map's style.
      *
      * @returns {Object} style
      */
@@ -615,6 +630,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
      * @param {string} layer ID of a layer
      * @param {Array} filter filter specification, as defined in the [Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/#types-filter)
      * @returns {Map} `this`
+     * @example
+     * map.setFilter('my-layer', ['==', 'name', 'USA']);
      */
     setFilter: function(layer, filter) {
         this.style.setFilter(layer, filter);
@@ -629,6 +646,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
      * @param {number} minzoom minimum zoom extent
      * @param {number} maxzoom maximum zoom extent
      * @returns {Map} `this`
+     * @example
+     * map.setLayerZoomRange('my-layer', 2, 5);
      */
     setLayerZoomRange: function(layerId, minzoom, maxzoom) {
         this.style.setLayerZoomRange(layerId, minzoom, maxzoom);
@@ -654,6 +673,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
      * @param {*} value value for the paint propery; must have the type appropriate for the property as defined in the [Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/)
      * @param {string=} klass optional class specifier for the property
      * @returns {Map} `this`
+     * @example
+     * map.setPaintProperty('my-layer', 'fill-color', '#faafee');
      */
     setPaintProperty: function(layer, name, value, klass) {
         this.style.setPaintProperty(layer, name, value, klass);
@@ -680,6 +701,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
      * @param {string} name name of a layout property
      * @param {*} value value for the layout propery; must have the type appropriate for the property as defined in the [Style Specification](https://www.mapbox.com/mapbox-gl-style-spec/)
      * @returns {Map} `this`
+     * @example
+     * map.setLayoutProperty('my-layer', 'visibility', 'none');
      */
     setLayoutProperty: function(layer, name, value) {
         this.style.setLayoutProperty(layer, name, value);
@@ -774,7 +797,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         if (this._frameId) {
             browser.cancelFrame(this._frameId);
         }
-        this.fire("webglcontextlost", {originalEvent: event});
+        this.fire('webglcontextlost', {originalEvent: event});
     },
 
     /**
@@ -789,7 +812,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         this._setupPainter();
         this.resize();
         this._update();
-        this.fire("webglcontextrestored", {originalEvent: event});
+        this.fire('webglcontextrestored', {originalEvent: event});
     },
 
     /**
@@ -833,40 +856,46 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
      * @private
      */
     _render: function() {
-        if (this.style && this._styleDirty) {
-            this._styleDirty = false;
-            this.style.update(this._classes, this._classOptions);
-            this._classOptions = null;
-            this.style._recalculate(this.transform.zoom);
-        }
+        try {
+            if (this.style && this._styleDirty) {
+                this._styleDirty = false;
+                this.style.update(this._classes, this._classOptions);
+                this._classOptions = null;
+                this.style._recalculate(this.transform.zoom);
+            }
 
-        if (this.style && this._sourcesDirty) {
-            this._sourcesDirty = false;
-            this.style._updateSources(this.transform);
-        }
+            if (this.style && this._sourcesDirty) {
+                this._sourcesDirty = false;
+                this.style._updateSources(this.transform);
+            }
 
-        this.painter.render(this.style, {
-            debug: this.showTileBoundaries,
-            vertices: this.vertices,
-            rotating: this.rotating,
-            zooming: this.zooming
-        });
+            this.painter.render(this.style, {
+                debug: this.showTileBoundaries,
+                showOverdrawInspector: this._showOverdrawInspector,
+                vertices: this.vertices,
+                rotating: this.rotating,
+                zooming: this.zooming
+            });
 
-        this.fire('render');
+            this.fire('render');
 
-        if (this.loaded() && !this._loaded) {
-            this._loaded = true;
-            this.fire('load');
-        }
+            if (this.loaded() && !this._loaded) {
+                this._loaded = true;
+                this.fire('load');
+            }
 
-        this._frameId = null;
+            this._frameId = null;
 
-        if (!this.animationLoop.stopped()) {
-            this._styleDirty = true;
-        }
+            if (!this.animationLoop.stopped()) {
+                this._styleDirty = true;
+            }
 
-        if (this._sourcesDirty || this._repaint || !this.animationLoop.stopped()) {
-            this._rerender();
+            if (this._sourcesDirty || this._repaint || !this.animationLoop.stopped()) {
+                this._rerender();
+            }
+
+        } catch (error) {
+            this.fire('error', error);
         }
 
         return this;
@@ -897,6 +926,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
      *
      * @example
      * // Disable the default error handler
+     * map.off('error', map.onError);
      * map.off('style.error', map.onError);
      * map.off('source.error', map.onError);
      * map.off('tile.error', map.onError);
@@ -997,8 +1027,23 @@ util.extendAll(Map.prototype, /** @lends Map.prototype */{
         this.style._redoPlacement();
     },
 
+    /*
+     * Show how many times each fragment has been shaded. White fragments have
+     * been shaded 8 or more times. Black fragments have been shaded 0 times.
+     *
+     * @name showOverdraw
+     * @type {boolean}
+     */
+    _showOverdrawInspector: false,
+    get showOverdrawInspector() { return this._showOverdrawInspector; },
+    set showOverdrawInspector(value) {
+        if (this._showOverdrawInspector === value) return;
+        this._showOverdrawInspector = value;
+        this._update();
+    },
+
     /**
-     * Enable continuous repaint to analyze performance
+     * Enable continuous repaint to analyze performance.
      *
      * @name repaint
      * @type {boolean}
@@ -1018,3 +1063,25 @@ function removeNode(node) {
         node.parentNode.removeChild(node);
     }
 }
+
+/**
+ * Options common to {@link Map#addClass}, {@link Map#removeClass},
+ * and {@link Map#setClasses}, controlling
+ * whether or not to smoothly transition property changes triggered by the class change.
+ *
+ * @typedef {Object} StyleOptions
+ * @property {boolean} transition
+ */
+
+ /**
+  * This event is fired whenever the map is drawn to the screen because of
+  *
+  *  - a change in map position, zoom, pitch, or bearing
+  *  - a change to the map style
+  *  - a change to a GeoJSON source
+  *  - a vector tile, GeoJSON file, glyph, or sprite being loaded
+  *
+  * @event render
+  * @memberof Map
+  * @instance
+  */

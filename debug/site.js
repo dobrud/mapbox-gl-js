@@ -40,25 +40,6 @@ map.on('load', function() {
         }
     }, 'country-label-lg');
 
-    map.addSource('geojson-random-points', {
-        "type": "geojson",
-        "data": "random.geojson"
-    });
-
-    map.addLayer({
-        "id": "random-points",
-        "type": "circle",
-        "source": "geojson-random-points",
-        "paint": {
-            "circle-radius": 5,
-            "circle-opacity": 0.5,
-            "circle-color": {
-                stops: [[0, 'red'], [100, 'violet']],
-                property: 'mapbox'
-            }
-        }
-    });
-
     var bufferTimes = {};
     map.on('tile.stats', function(bufferTimes) {
         var _stats = [];
@@ -93,6 +74,10 @@ document.getElementById('show-tile-boundaries-checkbox').onclick = function() {
 
 document.getElementById('show-symbol-collision-boxes-checkbox').onclick = function() {
     map.showCollisionBoxes = !!this.checked;
+};
+
+document.getElementById('show-overdraw-checkbox').onclick = function() {
+    map.showOverdrawInspector = !!this.checked;
 };
 
 document.getElementById('buffer-checkbox').onclick = function() {
